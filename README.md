@@ -4,7 +4,7 @@
 Node Package Manager (NPM) wrapper for [boot-clj][1].
 
 * Provides `npm` task for installing node modules.
-* Provides `exec` task for executing node modules. (auto-intalls local module)
+* Provides `exec` task for executing node modules. (auto-installs local module)
 
 > The following outlines basic usage of the task, extensive testing has not been done.
 > Please submit issues and pull requests!
