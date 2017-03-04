@@ -12,14 +12,14 @@
    r dry-run             bool     "Report what changes npm would have made. (usefull with boot -vv)"
    g global              bool     "Opperates in global mode. Packages are installed to prefix."
    c cache-key   VAL     kw       "Optional cache key for when npm is used with multiple dependency sets."]
-  (let [npmjsonf  (:npm         *opts* "./package.edn")
-        npmjsonc  (when (.exists (io/file npmjsonf)) (read-string (slurp npmjsonf)))
+  (let [npmjsonf  (:package     *opts* "./package.edn")
         deps      (:install     *opts*)
         dev       (:development *opts*)
         global    (:global      *opts*)
         cache-key (:cache-key   *opts* ::cache)
         tmp       (boot/cache-dir! cache-key)
         tmp-path  (.getAbsolutePath tmp)
+        npmjsonc  (when (.exists (io/file npmjsonf)) (read-string (slurp npmjsonf)))
         npmjson   (generate-string (merge-with into {:name "boot-npm" :version "0.1.0" :dependencies deps} npmjsonc))
         args      (cond-> ["install"]
                     (not dev) (conj "--production")
