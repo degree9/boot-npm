@@ -48,7 +48,11 @@
         tmp       (boot/cache-dir! cache-key)
         tmp-path  (.getAbsolutePath tmp)
         npmjsonc  (when (.exists (io/file npmjsonf)) (read-string (slurp npmjsonf)))
-        npmjson   (generate-string (deep-merge {:name "boot-npm" :version "0.1.0" :dependencies deps} npmjsonc))
+        npmjson   (generate-string
+                    (deep-merge
+                      {:name "boot-npm" :version "0.1.0" :dependencies deps}
+                      npmjsonc)
+                    {:pretty true})
         args      (cond-> ["install"]
                     (not dev) (conj "--production")
                     dry-run   (conj "--dry-run")
