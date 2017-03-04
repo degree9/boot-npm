@@ -1,15 +1,15 @@
 (set-env!
- :dependencies  '[[org.clojure/clojure                 "1.7.0"]
-                  [boot/core                           "2.5.1"]
-                  [adzerk/bootlaces                    "0.1.13"]
-                  [cheshire                            "5.5.0"]
-                  [degree9/boot-semver                 "1.2.4"]
-                  [degree9/boot-exec                   "0.2.0"]]
+ :dependencies  '[[org.clojure/clojure                 "1.8.0"]
+                  [boot/core                           "2.7.1"]
+                  [adzerk/bootlaces                    "0.1.13" :scope "test"]
+                  [cheshire                            "5.7.0"]
+                  [degree9/boot-semver                 "1.4.3" :scope "test"]
+                  [degree9/boot-exec                   "0.5.0"]]
  :resource-paths   #{"src"})
 
 (require
  '[adzerk.bootlaces :refer :all]
- '[boot-semver.core :refer :all])
+ '[degree9.boot-semver :refer :all])
 
 (task-options!
   pom {:project 'degree9/boot-npm
@@ -23,7 +23,7 @@
   []
   (comp
    (watch)
-   (version :no-update true
+   (version :develop true
             :minor 'inc
             :patch 'zero
             :pre-release 'snapshot)
