@@ -4,29 +4,57 @@
             [clojure.java.io :as io]
             [cheshire.core :refer :all]))
 
+;; Helper Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;https://github.com/metosin/ring-swagger/blob/1c5b8ab7ad7a5735624986bbb6b288aaf168d407/src/ring/swagger/common.clj#L53-L73
+(defn- deep-merge
+  "Recursively merges maps.
+   If the first parameter is a keyword it tells the strategy to
+   use when merging non-map collections. Options are
+   - :replace, the default, the last value is used
+   - :into, if the value in every map is a collection they are concatenated
+     using into. Thus the type of (first) value is maintained."
+  {:arglists '([strategy & values] [values])}
+  [& values]
+  (let [[values strategy] (if (keyword? (first values))
+                            [(rest values) (first values)]
+                            [values :replace])]
+    (cond
+      (every? map? values)
+      (apply merge-with (partial deep-merge strategy) values)
+
+      (and (= strategy :into) (every? coll? values))
+      (reduce into values)
+
+      :else
+      (last values))))
+
+;; Public Tasks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (boot/deftask npm
   "boot-clj wrapper for npm"
   [p package     VAL     str      "An edn file containing a package.json map."
    i install     FOO=BAR {kw str} "Dependency map."
-   d development         bool     "Include development dependencies with packages."
+   d develop             bool     "Include development dependencies with packages."
    r dry-run             bool     "Report what changes npm would have made. (usefull with boot -vv)"
    g global              bool     "Opperates in global mode. Packages are installed to prefix."
-   c cache-key   VAL     kw       "Optional cache key for when npm is used with multiple dependency sets."]
+   c cache-key   VAL     kw       "Optional cache key for when npm is used with multiple dependency sets."
+   _ include             bool     "Include package.json in fileset output."]
   (let [npmjsonf  (:package     *opts* "./package.edn")
         deps      (:install     *opts*)
-        dev       (:development *opts*)
+        dev       (:develop     *opts*)
         global    (:global      *opts*)
         cache-key (:cache-key   *opts* ::cache)
+        include?  (:include     *opts*)
         tmp       (boot/cache-dir! cache-key)
         tmp-path  (.getAbsolutePath tmp)
         npmjsonc  (when (.exists (io/file npmjsonf)) (read-string (slurp npmjsonf)))
-        npmjson   (generate-string (merge-with into {:name "boot-npm" :version "0.1.0" :dependencies deps} npmjsonc))
+        npmjson   (generate-string (deep-merge {:name "boot-npm" :version "0.1.0" :dependencies deps} npmjsonc))
         args      (cond-> ["install"]
                     (not dev) (conj "--production")
                     dry-run   (conj "--dry-run")
                     global    (conj "--global"))]
     (comp
-      (ex/properties :contents npmjson :directory tmp-path :file "package.json")
+      (ex/properties :contents npmjson :directory tmp-path :file "package.json" :include include?)
       (ex/exec :process "npm" :arguments args :directory tmp-path :local "bin"))))
 
 (boot/deftask exec
