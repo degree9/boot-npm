@@ -4,7 +4,7 @@
                   [adzerk/bootlaces                    "0.1.13" :scope "test"]
                   [cheshire                            "5.7.0"]
                   [degree9/boot-semver                 "1.4.3" :scope "test"]
-                  [degree9/boot-exec                   "0.5.0"]]
+                  [degree9/boot-exec                   "0.6.0"]]
  :resource-paths   #{"src"})
 
 (require
