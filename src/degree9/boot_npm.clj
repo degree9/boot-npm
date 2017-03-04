@@ -26,7 +26,7 @@
                     dry-run   (conj "--dry-run")
                     global    (conj "--global"))]
     (comp
-      (ex/properties :contents npmjson :directory tmp-path :file npmjsonf)
+      (ex/properties :contents npmjson :directory tmp-path :file "package.json")
       (ex/exec :process "npm" :arguments args :directory tmp-path :local "bin"))))
 
 (boot/deftask exec
