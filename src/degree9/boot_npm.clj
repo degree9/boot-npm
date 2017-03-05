@@ -55,7 +55,7 @@
                     global    (conj "--global"))]
     (comp
       (ex/properties :contents npmjson :directory tmp-path :file "package.json" :include include?)
-      (ex/exec :process "npm" :arguments args :directory tmp-path :local "bin"))))
+      (ex/exec :process "npm" :arguments args :directory tmp-path :local "bin" :include true))))
 
 (boot/deftask exec
   "Exec wrapper for npm modules"
@@ -76,4 +76,4 @@
         tmp-path  (.getAbsolutePath tmp)]
     (comp
       (npm :install install :cache-key cache-key :global global)
-      (ex/exec :process process :arguments args :cache-key cache-key :local (str "node_modules/" module "/bin")))))
+      (ex/exec :process process :arguments args :cache-key cache-key :local (str "node_modules/" module "/bin") :include true))))
