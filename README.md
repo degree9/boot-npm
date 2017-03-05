@@ -18,31 +18,46 @@ Add `boot-npm` to your `build.boot` dependencies and `require` the namespace:
 (require '[degree9.boot-npm :refer :all])
 ```
 
-Use npm to install bower:
-
-```bash
-boot {task} {args}
-```
-
-Use in a wrapper task:
+Install a Node Module:
 
 ```clojure
-(boot/deftask mytask
-  ""
-  [...]
-  (let [...]
-    (comp
-      {task-fn})))
+(boot/deftask bower
+  "Install bower to node_modules."
+  []
+  (npm/npm :install {:bower "latest"})))
 ```
 
 ##Task Options
 
-{options-description}
+The `npm` task exposes a few options when using npm as part of a build process.
 
 ```clojure
-{options}
+[p package     VAL     str      "An edn file containing a package.json map."
+ i install     FOO=BAR {kw str} "Dependency map."
+ d develop             bool     "Include development dependencies with packages."
+ r dry-run             bool     "Report what changes npm would have made. (usefull with boot -vv)"
+ g global              bool     "Opperates in global mode. Packages are installed to prefix."
+ c cache-key   VAL     kw       "Optional cache key for when npm is used with multiple dependency sets."
+ _ include             bool     "Include package.json in fileset output."]
 ```
 
-{options-notes}
+The :install option is provided for installing node modules, takes a map containing a dependency/version pair. This will install the module to a temporary `node_modules` folder and include this folder in the fileset output.
+
+```clojure
+(boot/deftask bower
+  "Install bower to node_modules."
+  []
+  (npm/npm :install {:bower "latest"}))
+```
+
+The :cache-key option is provided to avoid downloading node modules each time boot is restarted. This will cache the `node_modules` folder and include this folder in the fileset output.
+
+```clojure
+(boot/deftask bower
+  "Install bower to node_modules."
+  []
+  (npm/npm :install   {:bower "latest"}
+           :cache-key ::cache))
+```
 
 [1]: https://github.com/boot-clj/boot
