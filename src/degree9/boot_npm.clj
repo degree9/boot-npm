@@ -36,7 +36,7 @@
    i install     FOO=BAR {kw str} "Dependency map."
    d develop             bool     "Include development dependencies with packages."
    r dry-run             bool     "Report what changes npm would have made. (usefull with boot -vv)"
-   g global              bool     "Opperates in global mode. Packages are installed to prefix."
+   g global              bool     "Opperates in global mode. Packages are installed to npm prefix."
    c cache-key   VAL     kw       "Optional cache key for when npm is used with multiple dependency sets."
    _ include             bool     "Include package.json in fileset output."]
   (let [npmjsonf  (:package     *opts* "./package.edn")
