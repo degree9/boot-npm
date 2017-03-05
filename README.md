@@ -41,7 +41,8 @@ The `npm` task exposes a few options when using npm as part of a build process.
  r dry-run             bool     "Report what changes npm would have made. (usefull with boot -vv)"
  g global              bool     "Opperates in global mode. Packages are installed to prefix."
  c cache-key   VAL     kw       "Optional cache key for when npm is used with multiple dependency sets."
- _ include             bool     "Include package.json in fileset output."]
+ _ include             bool     "Include package.json in fileset output."
+ _ pretty              bool     "Pretty print generated package.json file"]
 ```
 
 The `:install` option is provided for installing node modules, takes a map containing a dependency/version pair. This will install the module to a temporary `node_modules` folder and include this folder in the fileset output.

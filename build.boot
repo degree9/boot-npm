@@ -12,6 +12,7 @@
  '[degree9.boot-semver :refer :all])
 
 (task-options!
+  target {:dir #{"target"}}
   pom {:project 'degree9/boot-npm
        :version (get-version)
        :description "boot-clj task for wrapping npm"
@@ -27,15 +28,14 @@
             :minor 'inc
             :patch 'zero
             :pre-release 'snapshot)
-   (target  :dir #{"target"})
+   (target)
    (build-jar)))
 
 (deftask deploy
   "Build boot-npm and deploy to clojars."
   []
   (comp
-   (version :minor 'inc
-            :patch 'zero)
-   (target  :dir #{"target"})
+   (version)
+   (target)
    (build-jar)
    (push-release)))
