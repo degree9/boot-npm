@@ -41,7 +41,7 @@ The `npm` task exposes a few options when using npm as part of a build process.
  _ include             bool     "Include package.json in fileset output."]
 ```
 
-The :install option is provided for installing node modules, takes a map containing a dependency/version pair. This will install the module to a temporary `node_modules` folder and include this folder in the fileset output.
+The `:install` option is provided for installing node modules, takes a map containing a dependency/version pair. This will install the module to a temporary `node_modules` folder and include this folder in the fileset output.
 
 ```clojure
 (boot/deftask bower
@@ -50,7 +50,7 @@ The :install option is provided for installing node modules, takes a map contain
   (npm/npm :install {:bower "latest"}))
 ```
 
-The :cache-key option is provided to avoid downloading node modules each time boot is restarted. This will cache the `node_modules` folder and include this folder in the fileset output.
+The `:cache-key` option is provided to avoid downloading node modules each time boot is restarted. This will cache the `node_modules` folder and include this folder in the fileset output.
 
 ```clojure
 (boot/deftask bower
