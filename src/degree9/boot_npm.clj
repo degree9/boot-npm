@@ -55,7 +55,6 @@
                     (not dev) (conj "--production")
                     dry-run   (conj "--dry-run")
                     global    (conj "--global"))]
-                    (prn npmjsonc npmjson)
     (comp
       (ex/properties :contents npmjson :directory tmp-path :file "package.json" :include include?)
       (ex/exec :process "npm" :arguments args :directory tmp-path :local "bin" :include true))))
