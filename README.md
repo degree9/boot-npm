@@ -18,7 +18,7 @@ Add `boot-npm` to your `build.boot` dependencies and `require` the namespace:
 
 ```clj
 (set-env! :dependencies '[[degree9/boot-npm "X.Y.Z" :scope "test"]])
-(require '[degree9.boot-npm :refer :all])
+(require '[degree9.boot-npm :as npm])
 ```
 
 Install a Node Module:
