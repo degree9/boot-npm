@@ -59,6 +59,35 @@
       (ex/properties :contents npmjson :directory tmp-path :file "package.json" :include include?)
       (ex/exec :process "npm" :arguments args :directory tmp-path :local "bin" :include true))))
 
+(boot/deftask yarn
+  "boot-clj wrapper for yarn"
+  [p package     VAL     str      "An edn file containing a package.json map."
+   a add     FOO=BAR {kw str}     "Dependency map."
+   d develop             bool     "Include development dependencies with packages."
+   r dry-run             bool     "Report what changes npm would have made. (usefull with boot -vv)"
+   g global              bool     "Opperates in global mode. Packages are installed to npm prefix."
+   c cache-key   VAL     kw       "Optional cache key for when npm is used with multiple dependency sets."
+   _ include             bool     "Include package.json in fileset output."
+   _ pretty              bool     "Pretty print generated package.json file"]
+  (let [npmjsonf  (:package   *opts* "./package.edn")
+        deps      (:add   *opts*)
+        dev       (:develop   *opts*)
+        global    (:global    *opts*)
+        cache-key (:cache-key *opts* ::cache)
+        include?  (:include   *opts*)
+        pretty?   (:pretty    *opts*)
+        tmp       (boot/cache-dir! cache-key)
+        tmp-path  (.getAbsolutePath tmp)
+        npmjsonc  (when (.exists (io/file npmjsonf)) (read-string (slurp npmjsonf)))
+        npmjson   (generate-string (deep-merge {:name "boot-npm" :version "0.1.0" :dependencies deps} npmjsonc) {:pretty pretty?})
+        args      (cond-> [""]
+                    (not dev) (conj "--production")
+                    dry-run   (conj "--dry-run")
+                    global    (conj "--global"))]
+    (comp
+      (ex/properties :contents npmjson :directory tmp-path :file "package.json" :include include?)
+      (ex/exec :process "yarn" :arguments args :directory tmp-path :local "bin" :include true))))
+
 (boot/deftask exec
   "Exec wrapper for npm modules"
   [m module         VAL  str      "NPM node module."
