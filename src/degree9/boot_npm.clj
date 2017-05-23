@@ -63,6 +63,7 @@
   "boot-clj wrapper for yarn"
   [p package     VAL     str      "An edn file containing a package.json map."
    a add     FOO=BAR {kw str}     "Dependency map."
+   l link        VAL     str      "link package"
    d develop             bool     "Include development dependencies with packages."
    r dry-run             bool     "Report what changes npm would have made. (usefull with boot -vv)"
    g global              bool     "Opperates in global mode. Packages are installed to npm prefix."
@@ -70,7 +71,7 @@
    _ include             bool     "Include package.json in fileset output."
    _ pretty              bool     "Pretty print generated package.json file"]
   (let [npmjsonf  (:package   *opts* "./package.edn")
-        deps      (:add   *opts*)
+        deps      (:add       *opts*)
         dev       (:develop   *opts*)
         global    (:global    *opts*)
         cache-key (:cache-key *opts* ::cache)
@@ -80,13 +81,12 @@
         tmp-path  (.getAbsolutePath tmp)
         npmjsonc  (when (.exists (io/file npmjsonf)) (read-string (slurp npmjsonf)))
         npmjson   (generate-string (deep-merge {:name "boot-npm" :version "0.1.0" :dependencies deps} npmjsonc) {:pretty pretty?})
-        args      (cond-> [""]
-                    (not dev) (conj "--production")
-                    dry-run   (conj "--dry-run")
-                    global    (conj "--global"))]
+        args      (cond-> []
+                    link      (into ["link" link])
+                    global    (conj "global"))]
     (comp
-      (ex/properties :contents npmjson :directory tmp-path :file "package.json" :include include?)
-      (ex/exec :process "yarn" :arguments args :directory tmp-path :local "bin" :include true))))
+     (ex/properties :contents npmjson :directory tmp-path :file "package.json" :include include?)
+     (ex/exec :process "yarn" :arguments args :directory tmp-path :local "bin" :include true))))
 
 (boot/deftask exec
   "Exec wrapper for npm modules"
