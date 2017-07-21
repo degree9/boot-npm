@@ -30,7 +30,7 @@ Install a Node Module:
   (npm/npm :install {:bower "latest"})))
 ```
 
-##Task Options
+## Task Options
 
 The `npm` task exposes a few options when using npm as part of a build process.
 
