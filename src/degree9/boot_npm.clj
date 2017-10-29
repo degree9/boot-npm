@@ -28,6 +28,17 @@
 
       :else
       (apply merge values))))
+;; Private Tasks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(boot/deftask node-modules
+  "Optionally copy from a node_modules folder in the project root."
+  [m managed bool "Sync node_modules folder."]
+  (let [tmp-path (:directory *opts*)
+        managed? (:managed *opts* false)]
+    (boot/with-pre-wrap fileset
+      (prn tmp-path)
+      (when managed? (boot/sync! tmp-path (io/file "./node_modules")))
+      fileset)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Public Tasks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (boot/deftask npm
@@ -38,6 +49,7 @@
    r dry-run             bool     "Report what changes npm would have made. (usefull with boot -vv)"
    g global              bool     "Opperates in global mode. Packages are installed to npm prefix."
    c cache-key   VAL     kw       "Optional cache key for when npm is used with multiple dependency sets."
+   m managed             bool     "Manage a project node_modules folder."
    _ include             bool     "Include package.json in fileset output."
    _ pretty              bool     "Pretty print generated package.json file"]
   (let [npmjsonf  (:package   *opts* "./package.edn")
@@ -45,6 +57,7 @@
         dev       (:develop   *opts*)
         global    (:global    *opts*)
         cache-key (:cache-key *opts* ::cache)
+        managed?  (:managed   *opts*)
         include?  (:include   *opts*)
         pretty?   (:pretty    *opts*)
         tmp       (boot/cache-dir! cache-key)
@@ -56,6 +69,7 @@
                     dry-run   (conj "--dry-run")
                     global    (conj "--global"))]
     (comp
+      (node-modules :managed managed? :directory tmp-path)
       (ex/properties :contents npmjson :directory tmp-path :file "package.json" :include include?)
       (ex/exec :process "npm" :arguments args :directory tmp-path :local "node_modules/npm/bin" :include true))))
 
