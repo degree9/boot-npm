@@ -12,7 +12,6 @@
 (task-options!
   target {:dir #{"target"}}
   pom {:project 'degree9/boot-npm
-       :version (get-version)
        :description "boot-clj task for wrapping npm"
        :url         "https://github.com/degree9/boot-npm"
        :scm         {:url "https://github.com/degree9/boot-npm"}})
