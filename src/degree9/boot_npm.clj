@@ -1,5 +1,6 @@
 (ns degree9.boot-npm
   (:require [boot.core :as boot]
+            [boot.util :as util]
             [degree9.boot-exec :as ex]
             [clojure.java.io :as io]
             [cheshire.core :refer :all]))
@@ -28,16 +29,19 @@
 
       :else
       (apply merge values))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; Private Tasks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (boot/deftask node-modules
-  "Optionally copy from a node_modules folder in the project root."
-  [m managed bool "Sync node_modules folder."]
-  (let [tmp-path (:directory *opts*)
-        managed? (:managed *opts* false)]
+  "Include project node_modules folder in fileset."
+  []
+  (let [tmp (boot/tmp-dir!)
+        npmdir (io/file tmp "node_modules")]
     (boot/with-pre-wrap fileset
-      (prn tmp-path)
-      (when managed? (boot/sync! tmp-path (io/file "./node_modules")))
-      fileset)))
+      (when (.exists (io/file "./node_modules"))
+        (util/info "Adding node_modules to fileset. \n")
+        (boot/sync! npmdir "./node_modules"))
+      (-> fileset (boot/add-resource tmp)))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Public Tasks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -49,7 +53,6 @@
    r dry-run             bool     "Report what changes npm would have made. (usefull with boot -vv)"
    g global              bool     "Opperates in global mode. Packages are installed to npm prefix."
    c cache-key   VAL     kw       "Optional cache key for when npm is used with multiple dependency sets."
-   m managed             bool     "Manage a project node_modules folder."
    _ include             bool     "Include package.json in fileset output."
    _ pretty              bool     "Pretty print generated package.json file"]
   (let [npmjsonf  (:package   *opts* "./package.edn")
@@ -69,7 +72,7 @@
                     dry-run   (conj "--dry-run")
                     global    (conj "--global"))]
     (comp
-      (node-modules :managed managed? :directory tmp-path)
+      (node-modules)
       (ex/properties :contents npmjson :directory tmp-path :file "package.json" :include include?)
       (ex/exec :process "npm" :arguments args :directory tmp-path :local "node_modules/npm/bin" :include true))))
 

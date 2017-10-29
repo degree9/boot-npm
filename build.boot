@@ -20,11 +20,11 @@
   "Build boot-npm for development."
   []
   (comp
-   (watch)
    (version :develop true
             :minor 'inc
             :patch 'zero
             :pre-release 'snapshot)
+   (watch)
    (target)
    (build-jar)))
 
