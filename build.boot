@@ -7,7 +7,6 @@
  :resource-paths   #{"src"})
 
 (require
- '[adzerk.bootlaces :refer :all]
  '[degree9.boot-semver :refer :all])
 
 (task-options!
