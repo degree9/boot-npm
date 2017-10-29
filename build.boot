@@ -1,20 +1,17 @@
 (set-env!
  :dependencies  '[[org.clojure/clojure                 "1.8.0"]
-                  [boot/core                           "2.7.1"]
-                  [adzerk/bootlaces                    "0.1.13" :scope "test"]
+                  [boot/core                           "2.7.2"]
                   [cheshire                            "5.7.1"]
-                  [degree9/boot-semver                 "1.4.4" :scope "test"]
+                  [degree9/boot-semver                 "1.7.0" :scope "test"]
                   [degree9/boot-exec                   "1.0.0"]]
  :resource-paths   #{"src"})
 
 (require
- '[adzerk.bootlaces :refer :all]
  '[degree9.boot-semver :refer :all])
 
 (task-options!
   target {:dir #{"target"}}
   pom {:project 'degree9/boot-npm
-       :version (get-version)
        :description "boot-clj task for wrapping npm"
        :url         "https://github.com/degree9/boot-npm"
        :scm         {:url "https://github.com/degree9/boot-npm"}})

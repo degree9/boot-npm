@@ -57,7 +57,7 @@
                     global    (conj "--global"))]
     (comp
       (ex/properties :contents npmjson :directory tmp-path :file "package.json" :include include?)
-      (ex/exec :process "npm" :arguments args :directory tmp-path :local "bin" :include true))))
+      (ex/exec :process "npm" :arguments args :directory tmp-path :local "node_modules/npm/bin" :include true))))
 
 (boot/deftask exec
   "Exec wrapper for npm modules"
