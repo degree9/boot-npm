@@ -2,6 +2,7 @@
   (:require [boot.core :as boot]
             [boot.util :as util]
             [degree9.boot-exec :as ex]
+            [degree9.boot-io :as file]
             [clojure.java.io :as io]
             [cheshire.core :refer :all]))
 
@@ -31,20 +32,13 @@
       (apply merge values))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Private Tasks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Public Tasks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (boot/deftask node-modules
   "Include project node_modules folder in fileset."
   []
-  (let [tmp (boot/tmp-dir!)
-        npmdir (io/file tmp "node_modules")]
-    (boot/with-pre-wrap fileset
-      (when (.exists (io/file "./node_modules"))
-        (util/info "Adding node_modules to fileset. \n")
-        (boot/sync! npmdir "./node_modules"))
-      (-> fileset (boot/add-resource tmp)))))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (file/add-directory :source "./node_modules/" :destination "./node_modules/"))
 
-;; Public Tasks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (boot/deftask npm
   "boot-clj wrapper for npm"
   [p package     VAL     str      "An edn file containing a package.json map."
@@ -72,7 +66,6 @@
                     dry-run   (conj "--dry-run")
                     global    (conj "--global"))]
     (comp
-      (node-modules)
       (ex/properties :contents npmjson :directory tmp-path :file "package.json" :include include?)
       (ex/exec :process "npm" :arguments args :directory tmp-path :local "node_modules/npm/bin" :include true))))
 
