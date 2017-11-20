@@ -31,7 +31,8 @@
 ;; Private Tasks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (boot/deftask node-modules
   "Optionally copy from a node_modules folder in the project root."
-  [m managed bool "Sync node_modules folder."]
+  [m managed   bool     "Sync node_modules folder."
+   d directory VAL  str "Directory where node_modules is created."]
   (let [tmp-path (:directory *opts*)
         managed? (:managed *opts* false)]
     (boot/with-pre-wrap fileset
