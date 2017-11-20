@@ -27,7 +27,7 @@
       (reduce into values)
 
       :else
-      (apply merge values))))
+      (second values))))
 ;; Private Tasks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (boot/deftask node-modules
   "Optionally copy from a node_modules folder in the project root."
