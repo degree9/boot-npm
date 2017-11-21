@@ -8,6 +8,7 @@
  :resource-paths   #{"src"})
 
 (require
+  '[degree9.boot-npm :refer :all]
  '[degree9.boot-semver :refer :all])
 
 (task-options!

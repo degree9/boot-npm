@@ -29,7 +29,11 @@
       (reduce into values)
 
       :else
-      (second values))))
+      (apply merge values))))
+
+(defn- fs-sync [tmp]
+  (boot/with-pre-wrap fileset
+    (apply boot/sync! tmp (boot/input-dirs fileset)) fileset))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Public Tasks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -54,7 +58,6 @@
         dev       (:develop   *opts*)
         global    (:global    *opts*)
         cache-key (:cache-key *opts* ::cache)
-        managed?  (:managed   *opts*)
         include?  (:include   *opts*)
         pretty?   (:pretty    *opts*)
         tmp       (boot/cache-dir! cache-key)
@@ -77,15 +80,21 @@
    a arguments      VAL  [str]    "List of arguments to pass to cli process."
    g global              bool     "Opperates in global mode. Packages are installed to global location."
    c cache-key      VAL  kw       "Optional cache key for when npm is used with multiple dependency sets."]
-  (let [module    (:module    *opts*)
-        process   (:process   *opts* module)
-        version   (:version   *opts* "*")
-        args      (:arguments *opts*)
-        global    (:global    *opts*)
-        cache-key (:cache-key *opts* ::cache)
-        install   (assoc {} (keyword module) version)
-        tmp       (boot/cache-dir! cache-key)
-        tmp-path  (.getAbsolutePath tmp)]
+  (let [module     (:module    *opts*)
+        process    (:process   *opts* module)
+        version    (:version   *opts* "*")
+        args       (:arguments *opts*)
+        global     (:global    *opts*)
+        cache-key  (:cache-key *opts* ::cache)
+        install    (assoc {} (keyword module) version)
+        tmp        (boot/tmp-dir!)
+        tmp-path   (.getAbsolutePath tmp)
+        cache      (boot/cache-dir! cache-key)
+        cache-path (.getAbsolutePath cache)]
     (comp
+      ;; Install NPM Module to Cache
       (npm :install install :cache-key cache-key :global global)
-      (ex/exec :process process :arguments args :cache-key cache-key :local (str "node_modules/" module "/bin") :include true))))
+      ;; Sync Input with Temp Directory
+      (fs-sync tmp)
+      ;; Execute Module from Cache with Temp Working Directory
+      (ex/exec :process process :arguments args :directory tmp-path :local (str cache-path "/node_modules/" module "/bin") :include true))))
