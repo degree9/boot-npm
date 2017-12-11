@@ -3,6 +3,7 @@
             [boot.util :as util]
             [degree9.boot-exec :as ex]
             [degree9.boot-io :as file]
+            [clojure.string :as s]
             [clojure.java.io :as io]
             [cheshire.core :refer :all]))
 
@@ -45,7 +46,7 @@
 
 (boot/deftask npm
   "boot-clj wrapper for npm"
-  [p package     VAL     str      "An edn file containing a package.json map."
+  [p package     VAL     str      "A package.json file."
    i install     FOO=BAR {kw str} "Dependency map."
    d develop             bool     "Include development dependencies with packages."
    r dry-run             bool     "Report what changes npm would have made. (usefull with boot -vv)"
@@ -53,8 +54,8 @@
    c cache-key   VAL     kw       "Optional cache key for when npm is used with multiple dependency sets."
    _ include             bool     "Include package.json in fileset output."
    _ pretty              bool     "Pretty print generated package.json file"]
-  (let [npmjsonf  (:package   *opts* "./package.edn")
-        deps      (:install   *opts*)
+  (let [npmjson   (:package   *opts* "./package.json")
+        install   (:install   *opts*)
         dev       (:develop   *opts*)
         global    (:global    *opts*)
         cache-key (:cache-key *opts* ::cache)
@@ -62,14 +63,17 @@
         pretty?   (:pretty    *opts*)
         tmp       (boot/cache-dir! cache-key)
         tmp-path  (.getAbsolutePath tmp)
-        npmjsonc  (when (.exists (io/file npmjsonf)) (read-string (slurp npmjsonf)))
-        npmjson   (generate-string (deep-merge {:name "boot-npm" :version "0.1.0" :dependencies deps} npmjsonc) {:pretty pretty?})
+        npmf      (io/file npmjson)
+        deps      (->> install
+                    (map #(clojure.string/join "@" %))
+                    (clojure.string/join " "))
         args      (cond-> ["install"]
+                    deps      (conj deps)
                     (not dev) (conj "--production")
                     dry-run   (conj "--dry-run")
                     global    (conj "--global"))]
     (comp
-      (ex/properties :contents npmjson :directory tmp-path :file "package.json" :include include?)
+      (file/add-file :source npmjson :destination "./package.json" :optional true)
       (ex/exec :process "npm" :arguments args :directory tmp-path :local "node_modules/npm/bin" :include true))))
 
 (boot/deftask exec
