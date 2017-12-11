@@ -47,7 +47,7 @@
 (boot/deftask npm
   "boot-clj wrapper for npm"
   [p package     VAL     str      "A package.json file."
-   i install     FOO=BAR {kw str} "Dependency map."
+   i install     FOO=BAR {str str} "Dependency map."
    d develop             bool     "Include development dependencies with packages."
    r dry-run             bool     "Report what changes npm would have made. (usefull with boot -vv)"
    g global              bool     "Opperates in global mode. Packages are installed to npm prefix."
