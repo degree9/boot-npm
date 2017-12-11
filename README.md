@@ -27,8 +27,13 @@ Install a Node Module:
 (boot/deftask bower
   "Install bower to node_modules."
   []
-  (npm/npm :install {:bower "latest"})))
+  (npm/npm :install {"bower" "latest"})))
 ```
+
+## Notes
+
+- Starting with version `1.8.1` the `:install` option no longer accepts keywords, use a map of strings instead.
+  ex. `{"bower" "latest"}`
 
 ## Task Options
 
@@ -36,7 +41,7 @@ The `npm` task exposes a few options when using npm as part of a build process.
 
 ```clojure
 [p package     VAL     str      "An edn file containing a package.json map."
- i install     FOO=BAR {kw str} "Dependency map."
+ i install     FOO=BAR {str str} "Dependency map."
  d develop             bool     "Include development dependencies with packages."
  r dry-run             bool     "Report what changes npm would have made. (usefull with boot -vv)"
  g global              bool     "Opperates in global mode. Packages are installed to prefix."
@@ -51,7 +56,7 @@ The `:install` option is provided for installing node modules, takes a map conta
 (boot/deftask bower
   "Install bower to node_modules."
   []
-  (npm/npm :install {:bower "latest"}))
+  (npm/npm :install {"bower" "latest"}))
 ```
 
 The `:cache-key` option is provided to avoid downloading node modules each time boot is restarted. This will cache the `node_modules` folder and include this folder in the fileset output.
@@ -60,7 +65,7 @@ The `:cache-key` option is provided to avoid downloading node modules each time 
 (boot/deftask bower
   "Install bower to node_modules."
   []
-  (npm/npm :install   {:bower "latest"}
+  (npm/npm :install   {"bower" "latest"}
            :cache-key ::cache))
 ```
 
