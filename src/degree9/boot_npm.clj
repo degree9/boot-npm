@@ -67,7 +67,7 @@
         args       (:arguments *opts*)
         global     (:global    *opts*)
         cache-key  (:cache-key *opts* ::cache)
-        install    (assoc {} (keyword module) version)
+        install    (assoc {} module version)
         tmp        (boot/tmp-dir!)
         tmp-path   (.getAbsolutePath tmp)
         cache      (boot/cache-dir! cache-key)
