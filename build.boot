@@ -1,12 +1,14 @@
 (set-env!
- :dependencies  '[[org.clojure/clojure                 "1.8.0"]
-                  [boot/core                           "2.7.2"]
-                  [cheshire                            "5.7.1"]
-                  [degree9/boot-semver                 "1.7.0" :scope "test"]
-                  [degree9/boot-exec                   "1.0.0"]]
+ :dependencies  '[[org.clojure/clojure "1.8.0"]
+                  [boot/core           "2.7.2"]
+                  [cheshire            "5.7.1"]
+                  [degree9/boot-semver "1.7.0" :scope "test"]
+                  [degree9/boot-io     "1.3.0"]
+                  [degree9/boot-exec   "1.0.0"]]
  :resource-paths   #{"src"})
 
 (require
+  '[degree9.boot-npm :refer :all]
  '[degree9.boot-semver :refer :all])
 
 (task-options!
@@ -20,11 +22,11 @@
   "Build boot-npm for development."
   []
   (comp
-   (watch)
    (version :develop true
             :minor 'inc
             :patch 'zero
             :pre-release 'snapshot)
+   (watch)
    (target)
    (build-jar)))
 
