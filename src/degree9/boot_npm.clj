@@ -8,33 +8,10 @@
             [cheshire.core :refer :all]))
 
 ;; Helper Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;https://github.com/metosin/ring-swagger/blob/1c5b8ab7ad7a5735624986bbb6b288aaf168d407/src/ring/swagger/common.clj#L53-L73
-(defn- deep-merge
-  "Recursively merges maps.
-   If the first parameter is a keyword it tells the strategy to
-   use when merging non-map collections. Options are
-   - :replace, the default, the last value is used
-   - :into, if the value in every map is a collection they are concatenated
-     using into. Thus the type of (first) value is maintained."
-  {:arglists '([strategy & values] [values])}
-  [& values]
-  (let [[values strategy] (if (keyword? (first values))
-                            [(rest values) (first values)]
-                            [values :replace])]
-    (cond
-      (every? map? values)
-      (apply merge-with (partial deep-merge strategy) values)
-
-      (and (= strategy :into) (every? coll? values))
-      (reduce into values)
-
-      :else
-      (apply merge values))))
-
 (defn- fs-sync [tmp]
   (boot/with-pre-wrap fileset
-    (apply boot/sync! tmp (boot/input-dirs fileset)) fileset))
+    (apply boot/sync! tmp (boot/input-dirs fileset))
+    fileset))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Public Tasks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -46,14 +23,14 @@
 
 (boot/deftask npm
   "boot-clj wrapper for npm"
-  [p package     VAL     str      "A package.json file."
-   i install     FOO=BAR {str str} "Dependency map."
-   d develop             bool     "Include development dependencies with packages."
-   r dry-run             bool     "Report what changes npm would have made. (usefull with boot -vv)"
-   g global              bool     "Opperates in global mode. Packages are installed to npm prefix."
-   c cache-key   VAL     kw       "Optional cache key for when npm is used with multiple dependency sets."
-   _ include             bool     "Include package.json in fileset output."
-   _ pretty              bool     "Pretty print generated package.json file"]
+  [p package     VAL str   "A package.json file."
+   i install     VAL [str] "Dependency map."
+   d develop         bool  "Include development dependencies with packages."
+   r dry-run         bool  "Report what changes npm would have made. (usefull with boot -vv)"
+   g global          bool  "Opperates in global mode. Packages are installed to npm prefix."
+   c cache-key   VAL kw    "Optional cache key for when npm is used with multiple dependency sets."
+   _ include         bool  "Include package.json in fileset output."
+   _ pretty          bool  "Pretty print generated package.json file"]
   (let [npmjson   (:package   *opts* "./package.json")
         install   (:install   *opts*)
         dev       (:develop   *opts*)
@@ -64,16 +41,14 @@
         tmp       (boot/cache-dir! cache-key)
         tmp-path  (.getAbsolutePath tmp)
         npmf      (io/file npmjson)
-        deps      (->> install
-                    (map #(clojure.string/join "@" %))
-                    (clojure.string/join " "))
         args      (cond-> ["install"]
-                    deps      (conj deps)
+                    install   (concat install)
                     (not dev) (conj "--production")
                     dry-run   (conj "--dry-run")
                     global    (conj "--global"))]
     (comp
       (file/add-file :source npmjson :destination "./package.json" :optional true)
+      (fs-sync tmp)
       (ex/exec :process "npm" :arguments args :directory tmp-path :local "node_modules/npm/bin" :include true))))
 
 (boot/deftask exec
@@ -86,11 +61,11 @@
    c cache-key      VAL  kw       "Optional cache key for when npm is used with multiple dependency sets."]
   (let [module     (:module    *opts*)
         process    (:process   *opts* module)
-        version    (:version   *opts* "*")
+        version    (:version   *opts* "latest")
         args       (:arguments *opts*)
         global     (:global    *opts*)
         cache-key  (:cache-key *opts* ::cache)
-        install    (assoc {} (keyword module) version)
+        install    [(str module "@" version)]
         tmp        (boot/tmp-dir!)
         tmp-path   (.getAbsolutePath tmp)
         cache      (boot/cache-dir! cache-key)
