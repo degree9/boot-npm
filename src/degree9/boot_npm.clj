@@ -42,7 +42,7 @@
         tmp-path  (.getAbsolutePath tmp)
         npmf      (io/file npmjson)
         args      (cond-> ["install"]
-                    deps      (concat deps)
+                    install   (concat install)
                     (not dev) (conj "--production")
                     dry-run   (conj "--dry-run")
                     global    (conj "--global"))]
