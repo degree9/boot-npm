@@ -23,14 +23,14 @@
 
 (boot/deftask npm
   "boot-clj wrapper for npm"
-  [p package     VAL     str      "A package.json file."
-   i install     FOO=BAR {str str} "Dependency map."
-   d develop             bool     "Include development dependencies with packages."
-   r dry-run             bool     "Report what changes npm would have made. (usefull with boot -vv)"
-   g global              bool     "Opperates in global mode. Packages are installed to npm prefix."
-   c cache-key   VAL     kw       "Optional cache key for when npm is used with multiple dependency sets."
-   _ include             bool     "Include package.json in fileset output."
-   _ pretty              bool     "Pretty print generated package.json file"]
+  [p package     VAL str   "A package.json file."
+   i install     VAL [str] "Dependency map."
+   d develop         bool  "Include development dependencies with packages."
+   r dry-run         bool  "Report what changes npm would have made. (usefull with boot -vv)"
+   g global          bool  "Opperates in global mode. Packages are installed to npm prefix."
+   c cache-key   VAL kw    "Optional cache key for when npm is used with multiple dependency sets."
+   _ include         bool  "Include package.json in fileset output."
+   _ pretty          bool  "Pretty print generated package.json file"]
   (let [npmjson   (:package   *opts* "./package.json")
         install   (:install   *opts*)
         dev       (:develop   *opts*)
@@ -41,16 +41,14 @@
         tmp       (boot/cache-dir! cache-key)
         tmp-path  (.getAbsolutePath tmp)
         npmf      (io/file npmjson)
-        deps      (->> install
-                    (map #(clojure.string/join "@" %))
-                    (clojure.string/join " "))
         args      (cond-> ["install"]
-                    deps      (conj deps)
+                    deps      (concat deps)
                     (not dev) (conj "--production")
                     dry-run   (conj "--dry-run")
                     global    (conj "--global"))]
     (comp
       (file/add-file :source npmjson :destination "./package.json" :optional true)
+      (fs-sync tmp)
       (ex/exec :process "npm" :arguments args :directory tmp-path :local "node_modules/npm/bin" :include true))))
 
 (boot/deftask exec
@@ -63,11 +61,11 @@
    c cache-key      VAL  kw       "Optional cache key for when npm is used with multiple dependency sets."]
   (let [module     (:module    *opts*)
         process    (:process   *opts* module)
-        version    (:version   *opts* "*")
+        version    (:version   *opts* "latest")
         args       (:arguments *opts*)
         global     (:global    *opts*)
         cache-key  (:cache-key *opts* ::cache)
-        install    (assoc {} module version)
+        install    [(str module "@" version)]
         tmp        (boot/tmp-dir!)
         tmp-path   (.getAbsolutePath tmp)
         cache      (boot/cache-dir! cache-key)
