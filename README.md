@@ -32,8 +32,10 @@ Install a Node Module:
 
 ## Notes
 
-- Starting with version `1.8.1` the `:install` option no longer accepts keywords, use a vector of strings instead.
+- Starting with version `1.9` the `:install` option no longer accepts keywords, use a vector of strings instead.
   ex. `["bower@latest"]`
+- Starting with version `1.8` the `:install` option no longer accepts keywords, use a map of strings instead.
+  ex. `{"bower" "latest"}`
 
 ## Task Options
 
