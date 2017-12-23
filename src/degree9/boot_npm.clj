@@ -46,7 +46,7 @@
     (comp
       (file/add-file :source npmjson :destination "./package.json" :optional true)
       (fs-sync tmp)
-      (ex/exec :process "npm" :arguments args :directory tmp-path :local "node_modules/npm/bin"))))
+      (ex/exec :process "npm" :arguments args :directory tmp-path :local "node_modules/npm/bin" :include true))))
 
 (boot/deftask exec
   "Exec wrapper for npm modules"
