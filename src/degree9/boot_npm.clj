@@ -46,7 +46,7 @@
     (comp
       (file/add-file :source npmjson :destination "./package.json" :optional true)
       (fs-sync tmp)
-      (ex/exec :process "npm" :arguments args :directory tmp-path :local "node_modules/npm/bin" :include true))))
+      (ex/exec :process "npm" :arguments args :directory tmp-path :local "node_modules/npm/bin" :include true :exclude #{#"^(.*)(?<!node_modules?)(.*)$"}))))
 
 (boot/deftask exec
   "Exec wrapper for npm modules"
@@ -56,6 +56,7 @@
    a arguments      VAL [str]    "List of arguments to pass to cli process."
    g global             bool     "Opperates in global mode. Packages are installed to global location."
    c cache-key      VAL kw       "Optional cache key for when npm is used with multiple dependency sets."
+   i include            bool     "Include working directory in fileset."
    e exclude        VAL #{regex} "Exclude files from being added to the fileset."]
   (let [module     (:module    *opts*)
         process    (:process   *opts* module)
@@ -63,6 +64,7 @@
         args       (:arguments *opts*)
         global     (:global    *opts*)
         cache-key  (:cache-key *opts* ::cache)
+        include    (:include   *opts*)
         exclude    (:exclude   *opts*)
         install    [(str module "@" version)]
         tmp        (boot/tmp-dir!)
@@ -75,5 +77,5 @@
       ;; Sync Input with Temp Directory
       (fs-sync tmp)
       ;; Execute Module from Cache with Temp Working Directory
-      (ex/exec :process process :arguments args :directory tmp-path :local (str cache-path "/node_modules/" module "/bin") :exclude exclude))))
+      (ex/exec :process process :arguments args :directory tmp-path :local (str cache-path "/node_modules/" module "/bin") :include include :exclude exclude))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
