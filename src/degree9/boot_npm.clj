@@ -27,6 +27,7 @@
    d develop       bool     "Include development dependencies with packages."
    r dry-run       bool     "Report what changes npm would have made. (usefull with boot -vv)"
    g global        bool     "Opperates in global mode. Packages are installed to npm prefix."
+   l package-lock  bool     "Enables the package-lock.json file."
    c cache-key VAL kw       "Optional cache key for when npm is used with multiple dependency sets."
    _ pretty        bool     "Pretty print generated package.json file"]
   (let [npmjson   (:package   *opts* "./package.json")
@@ -35,9 +36,11 @@
         global    (:global    *opts*)
         cache-key (:cache-key *opts* ::cache)
         pretty?   (:pretty    *opts*)
+        lock      (:package-lock *opts*)
         tmp       (boot/cache-dir! cache-key)
         tmp-path  (.getAbsolutePath tmp)
         npmf      (io/file npmjson)
+        npmrc     (s/join "=" ["package-lock" (boolean lock)])
         args      (cond-> ["install"]
                     install   (concat install)
                     (not dev) (conj "--production")
@@ -46,11 +49,12 @@
     (comp
       (file/add-file :source npmjson :destination "./package.json" :optional true)
       (fs-sync tmp)
+      (ex/properties :contents npmrc :directory tmp-path :file ".npmrc")
       (ex/exec :process "npm" :arguments args :directory tmp-path :local "node_modules/npm/bin" :include true :exclude #{#"^(.*)(?<!node_modules?)(.*)$"}))))
 
 (boot/deftask yarn
   "boot-clj wrapper for yarn"
-  [p package     VAL     str      "An edn file containing a package.json map."
+  [p package     VAL     str      "A package.json file."
    a add     FOO=BAR {kw str}     "Dependency map."
    l link        VAL     str      "link package"
    d develop             bool     "Include development dependencies with packages."
@@ -59,7 +63,7 @@
    c cache-key   VAL     kw       "Optional cache key for when npm is used with multiple dependency sets."
    _ include             bool     "Include package.json in fileset output."
    _ pretty              bool     "Pretty print generated package.json file"]
-  (let [npmjsonf  (:package   *opts* "./package.edn")
+  (let [npmjson  (:package   *opts* "./package.json")
         deps      (:add       *opts*)
         dev       (:develop   *opts*)
         global    (:global    *opts*)
@@ -68,13 +72,12 @@
         pretty?   (:pretty    *opts*)
         tmp       (boot/cache-dir! cache-key)
         tmp-path  (.getAbsolutePath tmp)
-        npmjsonc  (when (.exists (io/file npmjsonf)) (read-string (slurp npmjsonf)))
-        npmjson   (generate-string (deep-merge {:name "boot-npm" :version "0.1.0" :dependencies deps} npmjsonc) {:pretty pretty?})
         args      (cond-> []
                     link      (into ["link" link])
                     global    (conj "global"))]
     (comp
-     (ex/properties :contents npmjson :directory tmp-path :file "package.json" :include include?)
+     (file/add-file :source npmjson :destination "./package.json" :optional true)
+     (fs-sync tmp)
      (ex/exec :process "yarn" :arguments args :directory tmp-path :local "bin" :include true))))
 
 (boot/deftask exec
