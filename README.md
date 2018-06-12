@@ -6,6 +6,18 @@
 
 Node Package Manager (NPM) wrapper for [boot-clj][1].
 
+---
+
+<p align="center">
+  <a href="https://degree9.io" align="center">
+    <img width="135" src="http://degree9.io/images/degree9.png">
+  </a>
+  <br>
+  <b>boot-npm is developed and maintained by Degree9</b>
+</p>
+
+---
+
 * Provides `npm` task for installing node modules.
 * Provides `exec` task for executing node modules. (auto-installs local module)
 
