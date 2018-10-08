@@ -1,7 +1,8 @@
 # boot-npm
+
 [![Clojars Project](https://img.shields.io/clojars/v/degree9/boot-npm.svg)](https://clojars.org/degree9/boot-npm)
-[![Dependencies Status](https://jarkeeper.com/degree9/boot-npm/status.svg)](https://jarkeeper.com/degree9/boot-npm)
-[![Downloads](https://jarkeeper.com/degree9/boot-npm/downloads.svg)](https://jarkeeper.com/degree9/boot-npm)
+[![Dependencies Status](https://versions.deps.co/degree9/boot-npm/status.svg)](https://versions.deps.co/degree9/boot-npm)
+[![Downloads](https://versions.deps.co/degree9/boot-npm/downloads.svg)](https://versions.deps.co/degree9/boot-npm)
 <!--- [![CircleCI](https://circleci.com/gh/degree9/boot-npm.svg?style=svg)](https://circleci.com/gh/degree9/boot-npm) --->
 
 Node Package Manager (NPM) wrapper for [boot-clj][1].
