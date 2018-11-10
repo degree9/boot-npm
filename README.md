@@ -84,4 +84,16 @@ The `:cache-key` option is provided to avoid downloading node modules each time 
            :cache-key ::cache))
 ```
 
+---
+
+<p align="center">
+  <a href="https://www.patreon.com/degree9" align="center">
+    <img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160" alt="Patreon">
+  </a>
+  <br>
+  <b>Support this and other open-source projects on Patreon!</b>
+</p>
+
+---
+
 [1]: https://github.com/boot-clj/boot
