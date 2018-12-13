@@ -8,6 +8,18 @@
 
 Node Package Manager (NPM) wrapper for [boot-clj][boot-clj].
 
+---
+
+<p align="center">
+  <a href="https://degree9.io" align="center">
+    <img width="135" src="/.github/logo.png">
+  </a>
+  <br>
+  <b>boot-npm is developed and maintained by Degree9</b>
+</p>
+
+---
+
 * Provides `npm` task for installing node modules.
 * Provides `exec` task for executing node modules. (auto-installs local module)
 
@@ -80,7 +92,7 @@ The `:cache-key` option is provided to avoid downloading node modules each time 
     <img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160" alt="Patreon">
   </a>
   <br>
-  <b>Support this and other open- patrons.</b>
+  <b>Support this and other open-source projects on Patreon!</b>
 </p>
 
 ---
