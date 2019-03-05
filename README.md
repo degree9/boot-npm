@@ -44,13 +44,6 @@ Install a Node Module:
   (npm/npm :install ["bower@latest"])))
 ```
 
-## Notes
-
-- Starting with version `1.9` the `:install` option no longer accepts keywords, use a vector of strings instead.
-  ex. `["bower@latest"]`
-- Starting with version `1.8` the `:install` option no longer accepts keywords, use a map of strings instead.
-  ex. `{"bower" "latest"}`
-
 ## Task Options
 
 The `npm` task exposes a few options when using npm as part of a build process.
