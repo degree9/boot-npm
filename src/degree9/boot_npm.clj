@@ -9,9 +9,14 @@
 
 ;; Helper Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- fs-sync [tmp]
-  (boot/with-pre-wrap fileset
-    (apply boot/sync! tmp (boot/input-dirs fileset))
-    fileset))
+  (let [prev (atom nil)]
+    (boot/with-pre-wrap fileset
+      (let [diff (->> fileset
+                      (boot/fileset-diff @prev)
+                      (boot/input-dirs))]
+        (reset! prev fileset)
+        (apply boot/sync! tmp diff)
+        fileset))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Public Tasks ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
