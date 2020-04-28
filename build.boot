@@ -2,7 +2,7 @@
  :dependencies  '[[boot/core           "2.8.2"]
                   [cheshire            "5.8.1"]
                   [degree9/boot-semver "1.8.0" :scope "test"]
-                  [degree9/boot-io     "1.3.0"]
+                  [degree9/boot-io     "1.4.0"]
                   [degree9/boot-exec   "1.1.0"]]
  :resource-paths   #{"src"})
 
